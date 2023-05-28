@@ -1,10 +1,5 @@
 ﻿using MauiBudgetApp.Models;
 using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MauiBudgetApp.Data
 {
@@ -23,7 +18,7 @@ namespace MauiBudgetApp.Data
                 }
                 catch (Exception ex)
                 {
-                    // Need to log this....
+                    // Need to log the error and tell user about it
                     Console.WriteLine(ex.Message);
                 }
                 
@@ -35,19 +30,34 @@ namespace MauiBudgetApp.Data
             Database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
         }
 
-        public Task<List<TodoItem>> GetItemsAsync()
+        public Task<List<PayItem>> GetItemsAsync()
         {
-            return Database.Table<TodoItem>().ToListAsync();
+            return Database.Table<PayItem>().ToListAsync();
         }
 
-        public Task<List<PayItem>> GetExpenseItems()
+        public async Task<List<PayItem>> GetExpenseItems()
         {
-            return Database.Table<PayItem>().Where(i => !i.IsIncome).ToListAsync();
+            try
+            {
+                return await Database.Table<PayItem>().Where(i => i.IsExpense).ToListAsync();
+            }
+            catch (Exception)
+            {
+                return await ReturnEmptyList();
+            }
         }
 
-        public Task<List<PayItem>> GetIncomeItems()
+        public async Task<List<PayItem>> GetIncomeItems()
         {
-            return Database.Table<PayItem>().Where(i => i.IsIncome).ToListAsync();
+            try
+            {
+                return await Database.Table<PayItem>().Where(i => i.IsIncome).ToListAsync();
+            }
+            catch (Exception)
+            {
+
+                return await ReturnEmptyList();
+            }
         }
 
         public Task<PayItem> GetItemAsync(int id)
@@ -68,9 +78,25 @@ namespace MauiBudgetApp.Data
             }
         }
 
-        public Task<int> DeleteItemAsync(PayItem item)
+        public async Task<int> DeleteItemAsync(PayItem item)
         {
-            return Database.DeleteAsync(item);
+            try
+            {
+                return await Database.DeleteAsync(item);
+            }
+            catch (Exception ex)
+            {
+                await Task.CompletedTask;
+                return 0;
+            }
+
+        }
+
+        private async Task<List<PayItem>> ReturnEmptyList()
+        {
+            await Task.CompletedTask;
+            List<PayItem> empty = new List<PayItem>();
+            return empty;
         }
     }
 }

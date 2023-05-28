@@ -9,39 +9,22 @@ public partial class PayItemPage : ContentPage
     public PayItemPage()
 	{
 		InitializeComponent();
-
-        txtName.TextChanged += TxtName_TextChanged;
-        txtAmount.TextChanged += TxtAmount_TextChanged;
-        switchIncome.HandlerChanged += SwitchIncome_HandlerChanged;
-        switchPaid.HandlerChanged += SwitchPaid_HandlerChanged;
 	}
-
-    private void SwitchPaid_HandlerChanged(object sender, EventArgs e)
-    {
-        HandleUpdate();
-    }
-
-    private void SwitchIncome_HandlerChanged(object sender, EventArgs e)
-    {
-        HandleUpdate();
-    }
-
-    private void TxtAmount_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        HandleUpdate();
-    }
-
-    private void TxtName_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        HandleUpdate();
-    }
 
     async void OnSaveClicked(object sender, EventArgs e)
 	{
 		var payItem = (PayItem)BindingContext;
-		PayItemItemDatabase database = await PayItemItemDatabase.Instance;
-		await database.SaveItemAsync(payItem);
-		await Navigation.PopAsync();
+        if (payItem != null )
+        {
+            PayItemItemDatabase database = await PayItemItemDatabase.Instance;
+            await database.SaveItemAsync(payItem);
+            await Navigation.PopAsync();
+        }
+        else
+        {
+            await DisplayAlert("ERROR", "Error occured!", "OK");
+            await Navigation.PopAsync();
+        }
 	}
 
 	async void OnDeleteClicked(object sender, EventArgs e)
@@ -55,7 +38,9 @@ public partial class PayItemPage : ContentPage
 
 	async void OnCancelClicked(object sender, EventArgs e)
 	{
-        if (string.IsNullOrWhiteSpace(txtName.Text))
+        var payItem = (PayItem)BindingContext;
+
+        if (string.IsNullOrWhiteSpace(payItem.Name))
         {
             await Navigation.PopAsync();
         }

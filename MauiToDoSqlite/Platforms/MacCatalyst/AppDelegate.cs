@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace MauiToDoSqlite;
+namespace MauiBudgetApp;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate

@@ -1,5 +1,6 @@
 using MauiBudgetApp.Data;
 using MauiBudgetApp.Models;
+using System.ComponentModel;
 
 namespace MauiBudgetApp.Views;
 
@@ -8,20 +9,27 @@ public partial class PayItemListPage : ContentPage
 
 	private double incomeTotal = 0;
 	private double expenseTotal = 0;
+	private bool tablesExist;
 
 	public PayItemListPage()
 	{
 		InitializeComponent();
-		UpdateTotals();
-	}
+    }
 
 	protected override async void OnAppearing()
 	{
 		base.OnAppearing();
 		PayItemItemDatabase database = await PayItemItemDatabase.Instance;
-		expenseListView.ItemsSource = await database.GetExpenseItems();
-		incomeListView.ItemsSource = await database.GetItemsAsync();
-	}
+		var items = await database.GetItemsAsync();
+		if (items.Count > 0)
+		{
+            expenseListView.ItemsSource = await database.GetExpenseItems();
+			incomeListView.ItemsSource = await database.GetIncomeItems();
+
+            UpdateTotals();
+        }
+
+    }
 
 	async void OnItemAdded(object sender, EventArgs eventArgs)
 	{
@@ -34,7 +42,7 @@ public partial class PayItemListPage : ContentPage
         {
             await Navigation.PushAsync(new PayItemPage
             {
-                BindingContext = e.SelectedItem as TodoItem
+                BindingContext = e.SelectedItem as PayItem
             });
         }
     }
@@ -46,7 +54,7 @@ public partial class PayItemListPage : ContentPage
 		{
 			await Navigation.PushAsync(new PayItemPage
 			{
-				BindingContext = e.SelectedItem as TodoItem
+				BindingContext = e.SelectedItem as PayItem
 			});
 		}
 	}
@@ -72,13 +80,18 @@ public partial class PayItemListPage : ContentPage
 	private async void UpdateTotals()
 	{
         incomeTotal = await GetTotalsFor(true);
+        txtTotalIncome.Text = $"£{incomeTotal}";
         expenseTotal = await GetTotalsFor(false);
+        txtTotalExpense.Text = $"£{expenseTotal}";
+
         lblInitialText.Text = "Based on your income and expenses you are using";
+
         if (incomeTotal > 0)
         {
             double oneProcent = incomeTotal / 100;
-            progressMoneyLeft.Progress = Math.Round(expenseTotal / oneProcent, 0);
-			lblMoneyLeft.Text = $"{expenseTotal}/{incomeTotal}";
+            //var rounded = Math.Round();
+            await progressMoneyLeft.ProgressTo(expenseTotal / oneProcent, 3, Easing.Linear);
+			lblMoneyLeft.Text = $"£{String.Format("{0:.##}", expenseTotal)}/£{String.Format("{0:.##}", incomeTotal)}";
         }
 		else
 		{
@@ -114,5 +127,10 @@ public partial class PayItemListPage : ContentPage
         }
 
 		
+    }
+
+    private async void OnSettingsClick(object sender, EventArgs e)
+    {
+        await DisplayAlert("Settings", "Nothing happens here yet!", "OK");
     }
 }

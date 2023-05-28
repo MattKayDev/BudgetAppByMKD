@@ -9,10 +9,9 @@ namespace MauiBudgetApp.Models
 {
     public class PayItem
     {
-        public PayItem()
-        {
-            
-        }
+        private string amountText;
+        private double amount;
+        public PayItem() { }
 
         public PayItem(bool isIncome = false)
         {
@@ -25,15 +24,25 @@ namespace MauiBudgetApp.Models
             {
                 IsExpense = true;
                 IsIncome = isIncome;
-            }
+            }         
         }
 
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
         public string Name { get; set; }
-        public double Amount { get; set; }
-        public bool IsIncome { get; } = false;
-        public bool IsExpense { get; }
+        public double Amount 
+        {
+            get => amount;
+            set
+            {
+                amountText = $"£{value}";
+                amount = value;
+            } 
+        }
+
+        public string AmountText => amountText;
+        public bool IsIncome { get; set; } = false;
+        public bool IsExpense { get; set; }
         public bool IsPaid { get; set; } = false;
 
         public bool IsVisible { get; set; } = false;

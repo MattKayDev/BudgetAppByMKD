@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace MauiToDoSqlite;
+namespace MauiBudgetApp;
 
 public class Program
 {

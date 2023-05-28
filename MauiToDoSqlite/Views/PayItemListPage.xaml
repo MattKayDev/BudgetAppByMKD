@@ -3,35 +3,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiBudgetApp.Views.PayItemListPage"
              xmlns:models="clr-namespace:MauiBudgetApp.Models"
-             Title="Todo">
+             Title="Budget App">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Clicked="OnItemAdded" Text="+" IconImageSource="plus.png">
-        </ToolbarItem>
+        <ToolbarItem Clicked="OnSettingsClick" IconImageSource="cog.png"/>
+        <ToolbarItem Clicked="OnItemAdded" IconImageSource="plus.png"/>
+
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout Orientation="Horizontal">
+        <StackLayout Orientation="Vertical" Margin="10">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="34" />
+                    <RowDefinition Height="30" />
                 </Grid.RowDefinitions>
-                <Label x:Name="lblInitialText"/>
-                <Label x:Name="lblMoneyLeft"/>
-                <ProgressBar ProgressColor="Blue" x:Name="progressMoneyLeft"/>
-            </Grid>
+                <BoxView Color="LightGray"  CornerRadius="10" Grid.RowSpan="3"/>
 
-            <Label Text="Income Group"/>
+                <Label x:Name="lblInitialText" Grid.Row="0" Margin="10,10" FontSize="Medium" HorizontalOptions="Start"/>
+                <Label x:Name="lblMoneyLeft" Grid.Row="1" Margin="10,0" FontSize="Large" HorizontalOptions="End"/>
+                <ProgressBar ProgressColor="GreenYellow" x:Name="progressMoneyLeft" Grid.Row="2" Margin="10,10"/>
+            </Grid>
+            <StackLayout Orientation="Horizontal" Margin="10">
+                <Label Text="Income Group" HorizontalOptions="StartAndExpand"/>
+                <Label x:Name="txtTotalIncome" HorizontalOptions="End"/>
+            </StackLayout>
             <ListView x:Name="incomeListView" Margin="20" ItemSelected="OnIncomeItemSelected">
-                
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:PayItem">
+                        <ViewCell>
+                            <StackLayout Margin="20,0,0,0" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}"/>
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding AmountText}"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
             </ListView>
 
-            <Label Text="Expense Group"/>
+            <StackLayout Orientation="Horizontal" Margin="10">
+                <Label Text="Expense Group" HorizontalOptions="StartAndExpand"/>
+                <Label x:Name="txtTotalExpense" HorizontalOptions="End"/>
+            </StackLayout>
+            
             <ListView x:Name="expenseListView" Margin="20" ItemSelected="OnExpenseItemSelected">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:PayItem">
                         <ViewCell>
                             <StackLayout Margin="20,0,0,0" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                                 <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}"/>
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding AmountText}"/>
                                 <Image HorizontalOptions="End" IsVisible="{Binding IsPaid}" Source="check.png"/>
                             </StackLayout>
                         </ViewCell>

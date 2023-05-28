@@ -12,10 +12,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>MauiToDoSqlite</ApplicationTitle>
+		<ApplicationTitle>MauiBudgetApp</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.mauitodosqlite</ApplicationId>
+		<ApplicationId>com.companyname.MauiBudgetApp</ApplicationId>
 		<ApplicationIdGuid>e48c62ad-aa4c-477e-a4e3-2d711ef8a8a0</ApplicationIdGuid>
 
 		<!-- Versions -->
@@ -51,6 +51,7 @@
 
 	<ItemGroup>
 	  <None Remove="Resources\Images\back.png" />
+	  <None Remove="Resources\Images\cog.png" />
 	  <None Remove="Resources\Images\diskette.png" />
 	  <None Remove="Resources\Images\trash.png" />
 	</ItemGroup>

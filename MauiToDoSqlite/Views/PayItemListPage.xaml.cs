@@ -25,15 +25,7 @@ public partial class PayItemListPage : ContentPage
 
 	async void OnItemAdded(object sender, EventArgs eventArgs)
 	{
-		if (await DisplayAlert("","What would you like to add?", "Income", "Expense"))
-		{
-			await OpenNewItemPage(true);
-        }
-		else
-		{
-			await OpenNewItemPage(false);
-		}
-		
+		await OpenNewItemPage(await DisplayAlert("", "What would you like to add?", "Income", "Expense"));		
 	}
 
 	async void OnIncomeItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -65,22 +57,14 @@ public partial class PayItemListPage : ContentPage
 		{
             await Navigation.PushAsync(new PayItemPage
             {
-                BindingContext = new PayItem()
-                {
-                    IsIncome = false,
-                    IsExpense = true,
-                }
+                BindingContext = new PayItem(isExpense)
             });
         }
 		else
 		{
             await Navigation.PushAsync(new PayItemPage
             {
-                BindingContext = new PayItem()
-                {
-                    IsIncome = true,
-                    IsExpense = false,
-                }
+                BindingContext = new PayItem(isExpense)
             });
         }
     }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiBudgetApp.Views.PayItemPage"
+             Title="{Binding Name}"
+             NavigatedFrom="OnCancelClicked"
+             >
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Clicked="OnCancelClicked" Text="Back" IconImageSource="back.png" />
+        <ToolbarItem Text="{Binding Name}"/>
+        <ToolbarItem Clicked="OnSaveClicked" Text="Save" IconImageSource="diskette.png">
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout Margin="20" Spacing="10" VerticalOptions="StartAndExpand">
+            <Label Text="Name"/>
+            <Entry Text="{Binding Name}" x:Name="txtName"/>
+            <Label Text="Notes"/>
+            <Editor Text="{Binding Amount}" Keyboard="Numeric" x:Name="txtAmount"/>
+
+            <StackLayout Orientation="Horizontal">
+                <Label Margin="0,10"
+                       HorizontalOptions="StartAndExpand"
+                       Text="Is this an income?"/>
+                <Switch HorizontalOptions="EndAndExpand" IsToggled="{Binding IsIncome}" x:Name="switchIncome"/>
+                <Label Text="If it's an expense, has it been paid?" Margin="0,10" HorizontalOptions="StartAndExpand"/>
+                <Switch HorizontalOptions="EndAndExpand" IsToggled="{Binding IsPaid}" IsVisible="{Binding IsExpense}" x:Name="switchPaid"/>
+            </StackLayout>
+            
+            <ImageButton Clicked="OnDeleteClicked" Source="trash.png" IsVisible="{Binding IsVisible}" VerticalOptions="Start"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

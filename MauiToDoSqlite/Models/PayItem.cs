@@ -9,6 +9,10 @@ namespace MauiBudgetApp.Models
 {
     public class PayItem
     {
+        public PayItem()
+        {
+            
+        }
 
         public PayItem(bool isIncome = false)
         {

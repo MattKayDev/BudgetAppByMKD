@@ -91,11 +91,11 @@ public partial class PayItemListPage : ContentPage
             double oneProcent = incomeTotal / 100;
             //var rounded = Math.Round();
             await progressMoneyLeft.ProgressTo(expenseTotal / oneProcent, 3, Easing.Linear);
-			lblMoneyLeft.Text = $"£{String.Format("{0:.##}", expenseTotal)}/£{String.Format("{0:.##}", incomeTotal)}";
+			lblMoneyLeft.Text = $"£{String.Format("{0:.##}", expenseTotal)} / £{String.Format("{0:.##}", incomeTotal)}";
         }
 		else
 		{
-			lblMoneyLeft.Text = $"{expenseTotal}/0";
+			lblMoneyLeft.Text = $"£{expenseTotal} / £0";
 			progressMoneyLeft.Progress = 100;
 		}
     }

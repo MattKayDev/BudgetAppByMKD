@@ -29,8 +29,20 @@
                     <Switch HorizontalOptions="EndAndExpand" IsToggled="{Binding IsPaid}" IsVisible="{Binding IsExpense}" x:Name="switchPaid"/>
                 </StackLayout>
             </StackLayout>
+            <StackLayout Orientation="Horizontal" VerticalOptions="Center">
+                <Label Text="Delete item?" 
+                       TextColor="Red" 
+                       VerticalOptions="Center"
+                       HorizontalOptions="StartAndExpand"/>
+                <ImageButton Clicked="OnDeleteClicked" 
+                             Source="trash.png" 
+                             IsVisible="{Binding IsVisible}" 
+                             WidthRequest="50" 
+                             HeightRequest="50"
+                             HorizontalOptions="End"
+                             VerticalOptions="Center"/>
+            </StackLayout>
             
-            <ImageButton Clicked="OnDeleteClicked" Source="trash.png" IsVisible="{Binding IsVisible}" WidthRequest="75" HeightRequest="75" HorizontalOptions="Start" VerticalOptions="Start" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

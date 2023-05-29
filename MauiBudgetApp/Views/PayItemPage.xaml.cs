@@ -29,10 +29,13 @@ public partial class PayItemPage : ContentPage
 
 	async void OnDeleteClicked(object sender, EventArgs e)
 	{
-		var payItem = (PayItem)BindingContext;
-		PayItemItemDatabase database = await PayItemItemDatabase.Instance;
-		await database.DeleteItemAsync(payItem);
-		await Navigation.PopAsync();
+        var payItem = (PayItem)BindingContext;
+        if (await DisplayAlert("Are you sure?", $"Are you sure you want to delete {payItem.Name}?", "Yes", "No"))
+        {
+            PayItemItemDatabase database = await PayItemItemDatabase.Instance;
+            await database.DeleteItemAsync(payItem);
+            await Navigation.PopAsync();
+        }
 	}
 
 

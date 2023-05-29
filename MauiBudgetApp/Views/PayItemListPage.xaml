@@ -29,13 +29,13 @@
                 <Label Text="Income Group" HorizontalOptions="StartAndExpand"/>
                 <Label x:Name="txtTotalIncome" HorizontalOptions="End"/>
             </StackLayout>
-            <ListView x:Name="incomeListView" Margin="20" ItemSelected="OnIncomeItemSelected">
+            <ListView x:Name="incomeListView" Margin="5" ItemSelected="OnIncomeItemSelected" HeightRequest="100" VerticalOptions="Start">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:PayItem">
                         <ViewCell>
                             <StackLayout Margin="20,0,0,0" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
-                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}"/>
-                                <Label HorizontalOptions="StartAndExpand" Text="{Binding AmountText}"/>
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}" FontSize="Medium"/>
+                                <Label HorizontalOptions="End" Text="{Binding AmountText}" FontSize="Medium" TextColor="Grey"/>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>
@@ -52,8 +52,8 @@
                     <DataTemplate x:DataType="models:PayItem">
                         <ViewCell>
                             <StackLayout Margin="20,0,0,0" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
-                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}"/>
-                                <Label HorizontalOptions="StartAndExpand" Text="{Binding AmountText}"/>
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}" FontSize="Medium"/>
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding AmountText}" FontSize="Medium" TextColor="Grey"/>
                                 <Image HorizontalOptions="End" IsVisible="{Binding IsPaid}" Source="check.png"/>
                             </StackLayout>
                         </ViewCell>

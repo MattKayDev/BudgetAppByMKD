@@ -28,7 +28,6 @@ public partial class PayItemListPage : ContentPage
 
             UpdateTotals();
         }
-
     }
 
 	async void OnItemAdded(object sender, EventArgs eventArgs)
@@ -82,9 +81,10 @@ public partial class PayItemListPage : ContentPage
         incomeTotal = await GetTotalsFor(true);
         txtTotalIncome.Text = $"£{incomeTotal}";
         expenseTotal = await GetTotalsFor(false);
+        txtExpenseTotal.Text = $"£{expenseTotal}";
         txtTotalExpense.Text = $"£{expenseTotal}";
 
-        lblInitialText.Text = "Based on your income and expenses you are using";
+        lblInitialText.Text = $"Based on your income and expenses you are using {expenseTotal} of your budget.";
 
         if (incomeTotal > 0)
         {

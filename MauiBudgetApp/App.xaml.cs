@@ -10,7 +10,8 @@ public partial class App : Application
 
 		MainPage = new NavigationPage(new PayItemListPage())
 		{
-			BarTextColor = Color.FromRgb(255, 255, 255)
+			BarTextColor = Color.FromRgb(255,255,255),
+			BarBackgroundColor = Color.FromArgb("#3366ff")
 		};
 	}
 }

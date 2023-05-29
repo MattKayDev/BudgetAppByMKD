@@ -16,7 +16,7 @@
         <StackLayout Margin="20" Spacing="10" VerticalOptions="StartAndExpand">
             <Label Text="Name"/>
             <Entry Text="{Binding Name}"/>
-            <Label Text="Notes"/>
+            <Label Text="Amount"/>
             <Editor Text="{Binding Amount}" Keyboard="Numeric"/>
 
             <StackLayout Orientation="Vertical">

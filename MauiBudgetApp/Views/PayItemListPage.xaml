@@ -53,8 +53,8 @@
                         <ViewCell>
                             <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
                                 <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}" FontSize="Small" VerticalOptions="Center"/>
+                                <Image HorizontalOptions="End" IsVisible="{Binding IsPaid}" Source="checkmark.png" VerticalOptions="Center" HeightRequest="12"/>
                                 <Label HorizontalOptions="End" Margin="10,0" Text="{Binding AmountText}" FontSize="Small" TextColor="Grey" VerticalOptions="Center"/>
-                                <Image HorizontalOptions="End" IsVisible="{Binding IsPaid}" Source="check.png" VerticalOptions="Center" HeightRequest="12"/>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>

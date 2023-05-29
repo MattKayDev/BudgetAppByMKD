@@ -89,14 +89,25 @@ public partial class PayItemListPage : ContentPage
         if (incomeTotal > 0)
         {
             double oneProcent = incomeTotal / 100;
-            //var rounded = Math.Round();
-            await progressMoneyLeft.ProgressTo(expenseTotal / oneProcent, 3, Easing.Linear);
-			lblMoneyLeft.Text = $"£{String.Format("{0:.##}", expenseTotal)} / £{String.Format("{0:.##}", incomeTotal)}";
+            var progress = (expenseTotal / oneProcent) * 0.01;
+            progressMoneyLeft.Progress = 1 - progress;
+			lblMoneyOutOf.Text = $"£{String.Format("{0:.##}", expenseTotal)} / £{String.Format("{0:.##}", incomeTotal)}";
+            var moneyLeft = incomeTotal - expenseTotal;
+            if (expenseTotal > incomeTotal)
+            {
+                lblMoneyLeft.Text = $"You are using £{expenseTotal} over your budget of {incomeTotal}";
+            }
+            else
+            {
+                lblMoneyLeft.Text = $"You have £{moneyLeft} left of your budget";
+            }
+            
         }
 		else
 		{
-			lblMoneyLeft.Text = $"£{expenseTotal} / £0";
-			progressMoneyLeft.Progress = 100;
+			lblMoneyOutOf.Text = $"£{expenseTotal} / £0";
+			progressMoneyLeft.Progress = 0;
+            lblMoneyLeft.Text = $"You are using £{expenseTotal} over your budget";
 		}
     }
 

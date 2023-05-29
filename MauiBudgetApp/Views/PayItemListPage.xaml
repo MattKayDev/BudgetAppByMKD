@@ -26,16 +26,16 @@
                 <Label x:Name="lblMoneyLeft" Grid.Row="3" Margin="10,0"/>
             </Grid>
             <StackLayout Orientation="Horizontal" Margin="10">
-                <Label Text="Income Group" HorizontalOptions="StartAndExpand"/>
-                <Label x:Name="txtTotalIncome" HorizontalOptions="End"/>
+                <Label Text="Income Group" HorizontalOptions="StartAndExpand" FontSize="Medium"/>
+                <Label x:Name="txtTotalIncome" HorizontalOptions="End" FontSize="Medium" FontAttributes="Bold"/>
             </StackLayout>
             <ListView x:Name="incomeListView" Margin="5" ItemSelected="OnIncomeItemSelected" HeightRequest="100" VerticalOptions="Start">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:PayItem">
                         <ViewCell>
                             <StackLayout Margin="20,0,0,0" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
-                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}" FontSize="Medium"/>
-                                <Label HorizontalOptions="End" Text="{Binding AmountText}" FontSize="Medium" TextColor="Grey"/>
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}" FontSize="Small" VerticalOptions="Center"/>
+                                <Label HorizontalOptions="End" Text="{Binding AmountText}" FontSize="Small" TextColor="Grey" VerticalOptions="Center"/>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>
@@ -43,18 +43,18 @@
             </ListView>
 
             <StackLayout Orientation="Horizontal" Margin="10">
-                <Label Text="Expense Group" HorizontalOptions="StartAndExpand"/>
-                <Label x:Name="txtTotalExpense" HorizontalOptions="End"/>
+                <Label Text="Expense Group" HorizontalOptions="StartAndExpand" FontSize="Medium"/>
+                <Label x:Name="txtTotalExpense" HorizontalOptions="End" FontSize="Medium" FontAttributes="Bold"/>
             </StackLayout>
             
             <ListView x:Name="expenseListView" Margin="20" ItemSelected="OnExpenseItemSelected">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:PayItem">
                         <ViewCell>
-                            <StackLayout Margin="20,0,0,0" HorizontalOptions="FillAndExpand" Orientation="Horizontal">
-                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}" FontSize="Medium"/>
-                                <Label HorizontalOptions="StartAndExpand" Text="{Binding AmountText}" FontSize="Medium" TextColor="Grey"/>
-                                <Image HorizontalOptions="End" IsVisible="{Binding IsPaid}" Source="check.png"/>
+                            <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                                <Label HorizontalOptions="StartAndExpand" Text="{Binding Name}" FontSize="Small" VerticalOptions="Center"/>
+                                <Label HorizontalOptions="End" Margin="10,0" Text="{Binding AmountText}" FontSize="Small" TextColor="Grey" VerticalOptions="Center"/>
+                                <Image HorizontalOptions="End" IsVisible="{Binding IsPaid}" Source="check.png" VerticalOptions="Center" HeightRequest="12"/>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>

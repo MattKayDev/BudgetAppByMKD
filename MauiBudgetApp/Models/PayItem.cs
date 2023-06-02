@@ -10,7 +10,7 @@ namespace MauiBudgetApp.Models
     public class PayItem
     {
         private string amountText;
-        private double amount;
+        private decimal amount;
         public PayItem() { }
 
         public PayItem(bool isIncome = false)
@@ -30,7 +30,7 @@ namespace MauiBudgetApp.Models
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
         public string Name { get; set; }
-        public double Amount 
+        public decimal Amount 
         {
             get => amount;
             set

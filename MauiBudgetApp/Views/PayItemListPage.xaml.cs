@@ -1,33 +1,43 @@
 using MauiBudgetApp.Data;
 using MauiBudgetApp.Models;
+using MauiBudgetApp.Services;
 using System.ComponentModel;
 
 namespace MauiBudgetApp.Views;
 
 public partial class PayItemListPage : ContentPage
 {
-
-	private double incomeTotal = 0;
-	private double expenseTotal = 0;
-	private bool tablesExist;
+    PayItemService payItemService;
+	private decimal incomeTotal = 0;
+	private decimal expenseTotal = 0;
 
 	public PayItemListPage()
 	{
 		InitializeComponent();
+        this.payItemService = new PayItemService();
     }
 
 	protected override async void OnAppearing()
 	{
 		base.OnAppearing();
-		PayItemItemDatabase database = await PayItemItemDatabase.Instance;
-		var items = await database.GetItemsAsync();
-		if (items.Count > 0)
-		{
-            expenseListView.ItemsSource = await database.GetExpenseItems();
-			incomeListView.ItemsSource = await database.GetIncomeItems();
 
-            UpdateTotals();
+        var expenseItems = await this.payItemService.GetExpenseItemsAsync();
+        if (expenseItems.Count > 0)
+        {
+            expenseListView.ItemsSource = expenseItems;
+            this.expenseTotal = this.payItemService.GetTotalFor(expenseItems);
+            txtTotalExpense.Text = $"£ {this.expenseTotal}";
         }
+
+        var incomeItems = await this.payItemService.GetIncomeItemsAsync();
+        if (incomeItems.Count > 0)
+        {
+            incomeListView.ItemsSource = incomeItems;
+            this.incomeTotal = this.payItemService.GetTotalFor(incomeItems);
+            txtTotalIncome.Text = $"£ {this.incomeTotal}";            
+        }    
+
+        UpdateTotals(expenseItems.Count, incomeItems.Count);
     }
 
 	async void OnItemAdded(object sender, EventArgs eventArgs)
@@ -76,93 +86,52 @@ public partial class PayItemListPage : ContentPage
         }
     }
 
-	private async void UpdateTotals()
+	private void UpdateTotals(int expenseCount, int incomeCount)
 	{
-        incomeTotal = await GetTotalsFor(true);
-        expenseTotal = await GetTotalsFor(false);
-        double moneyLeftAmount = incomeTotal - expenseTotal;
-
-        string expenseTotalText = $"£{String.Format("{0:.##}", expenseTotal)}";
-        string incomeTotalText = $"£{String.Format("{0:.##}", incomeTotal)}";
-        string moneyLeftText = $"£{String.Format("{0:.##}", moneyLeftAmount)}";
-
-        txtTotalIncome.Text = incomeTotalText;
-        txtTotalExpense.Text = expenseTotalText;
-
-        //lblExpenseTotal.Text = expenseTotalText;
-
-        //lblInitialText.Text = $"Based on your income and expenses you are using {String.Format("{0:.##}", expenseTotal)} of your budget.";
-
-        if (incomeTotal > 0)
+        if (expenseCount > 0 && incomeCount > 0)
         {
-            double oneProcent = incomeTotal / 100;
-            var progress = (expenseTotal / oneProcent) * 0.01;
-            progressMoneyLeft.Progress = 1 - progress;
+            decimal moneyLeftAmount = this.incomeTotal - this.expenseTotal;
+            string moneyLeftText = $"£{moneyLeftAmount}";
 
-			lblMoneyOutOf.Text = $"{expenseTotalText} / {incomeTotalText}";
-
-            if (expenseTotal > incomeTotal)
+            if (this.incomeTotal > 0)
             {
-                lblDashboardStart.Text = "Based on your income and expenses you are using ";
-                lblDashboardAmount.Text = $"£{moneyLeftAmount * -1}";
-                lblDashboardEnd.Text = $" over your budget of £{incomeTotal}";
-                //lblInitialText.Text = $"{lblDashboardStart.Text}{expenseTotalText}{lblDashboardEnd.Text}";
-                lblInitialText.Text = $"{lblDashboardStart.Text}{lblDashboardAmount.Text}{lblDashboardEnd.Text}";
+                decimal oneProcent = this.incomeTotal / 100;
+                var progress = Convert.ToDouble((this.expenseTotal / oneProcent)) * 0.01;
+                progressMoneyLeft.Progress = 1 - progress;
 
-                lblMoneyLeftStart.Text = "You have ";
-                lblMoneyLeftAmount.Text = moneyLeftText;
-                lblMoneyLeftEnd.Text = " left of your budget.";
+                lblMoneyOutOf.Text = $"{txtTotalExpense.Text} / {txtTotalIncome.Text}";
+
+                if (this.expenseTotal > this.incomeTotal)
+                {
+                    lblDashboardStart.Text = "Based on your income and expenses you are using ";
+                    lblDashboardAmount.Text = $"£{moneyLeftAmount * -1}";
+                    lblDashboardEnd.Text = $" over your budget of £{this.incomeTotal}";
+                    lblInitialText.Text = $"{lblDashboardStart.Text}{lblDashboardAmount.Text}{lblDashboardEnd.Text}";
+
+                    lblMoneyLeftStart.Text = "You have ";
+                    lblMoneyLeftAmount.Text = moneyLeftText;
+                    lblMoneyLeftEnd.Text = " left of your budget.";
+                }
+                else
+                {
+
+                    lblDashboardStart.Text = "Based on your income and expenses you are using ";
+                    lblDashboardAmount.Text = txtTotalExpense.Text;
+                    lblDashboardEnd.Text = $" of your budget.";
+                    lblInitialText.Text = $"{lblDashboardStart.Text}{txtTotalExpense.Text}{lblDashboardEnd.Text}";
+
+                    lblMoneyLeftStart.Text = "You have ";
+                    lblMoneyLeftAmount.Text = moneyLeftText;
+                    lblMoneyLeftEnd.Text = " left of your budget.";
+                }
             }
             else
             {
-
-                lblDashboardStart.Text = "Based on your income and expenses you are using ";
-                lblDashboardAmount.Text = expenseTotalText;
-                lblDashboardEnd.Text = $" of your budget.";
-                lblInitialText.Text = $"{lblDashboardStart.Text}{expenseTotalText}{lblDashboardEnd.Text}";
-
-                lblMoneyLeftStart.Text = "You have ";
-                lblMoneyLeftAmount.Text = moneyLeftText;
-                lblMoneyLeftEnd.Text = " left of your budget.";
-                //lblMoneyLeft.Text = $"You have £{String.Format("{0:.##}", moneyLeft)} left of your budget";
+                lblMoneyOutOf.Text = $"£{this.expenseTotal} / £0";
+                progressMoneyLeft.Progress = 0;
+                lblMoneyLeft.Text = $"You are using £{this.expenseTotal} over your budget";
             }
-            
         }
-		else
-		{
-			lblMoneyOutOf.Text = $"£{String.Format("{0:.##}", expenseTotal)} / £0";
-			progressMoneyLeft.Progress = 0;
-            lblMoneyLeft.Text = $"You are using £{String.Format("{0:.##}", expenseTotal)} over your budget";
-		}
-    }
-
-	private async Task<double> GetTotalsFor(bool isIncome)
-	{
-        PayItemItemDatabase database = await PayItemItemDatabase.Instance;
-		if (isIncome)
-		{
-			var items = await database.GetIncomeItems();
-            double total = 0;
-            foreach (var item in items)
-            {
-                total += item.Amount;
-            }
-
-            return total;
-        }
-		else
-		{
-            var items = await database.GetExpenseItems();
-            double total = 0;
-            foreach (var item in items)
-            {
-                total += item.Amount;
-            }
-
-            return total;
-        }
-
-		
     }
 
     private async void OnSettingsClick(object sender, EventArgs e)

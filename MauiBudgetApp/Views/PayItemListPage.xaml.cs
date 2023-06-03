@@ -132,7 +132,8 @@ public partial class PayItemListPage : ContentPage
 
     private async void OnSettingsClick(object sender, EventArgs e)
     {
-        await DisplayAlert("Settings", "Nothing happens here yet!", "OK");
+        //await DisplayAlert("Settings", "Nothing happens here yet!", "OK");
+        await Navigation.PushAsync(new SettingsView());
     }
 
     private void SetupDashboardWithIncomeOnly()

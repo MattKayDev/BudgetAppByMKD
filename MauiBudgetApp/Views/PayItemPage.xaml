@@ -33,7 +33,8 @@
                 <Label Text="Delete item?" 
                        TextColor="Red" 
                        VerticalOptions="Center"
-                       HorizontalOptions="StartAndExpand"/>
+                       HorizontalOptions="StartAndExpand"
+                       IsVisible="{Binding IsVisible}"/>
                 <ImageButton Clicked="OnDeleteClicked" 
                              Source="trash.png" 
                              IsVisible="{Binding IsVisible}" 

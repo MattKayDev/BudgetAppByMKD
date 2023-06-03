@@ -65,24 +65,9 @@ public partial class PayItemListPage : ContentPage
     }
 
 	async void OnItemAdded(object sender, EventArgs eventArgs)
-	{	
-        var answer = await DisplayActionSheet("What would you like to add?", "Cancel", null, new string[] { "Income", "Expense" });
-        switch (answer)
-        {
-            case "Income":
-                {
-                    await OpenNewItemPage(false);
-                    break;
-                }
-            case "Expense":
-                {
-                    await OpenNewItemPage();
-                    break;
-                }
-            default:
-                break;
-        }
-	}
+	{
+        await AddItem();
+    }
 
 	async void OnIncomeItemSelected(object sender, SelectedItemChangedEventArgs e)
 	{
@@ -229,5 +214,30 @@ public partial class PayItemListPage : ContentPage
     {
             gridDashboardMain.IsVisible = !hide;
             gridDashboardEmpty.IsVisible = hide;
+    }
+
+    private async Task AddItem()
+    {
+        var answer = await DisplayActionSheet("What would you like to add?", "Cancel", null, new string[] { "Income", "Expense" });
+        switch (answer)
+        {
+            case "Income":
+                {
+                    await OpenNewItemPage(false);
+                    break;
+                }
+            case "Expense":
+                {
+                    await OpenNewItemPage();
+                    break;
+                }
+            default:
+                break;
+        }
+    }
+
+    private async void btnDashboardAddItem_Clicked(object sender, EventArgs e)
+    {
+        await AddItem();
     }
 }

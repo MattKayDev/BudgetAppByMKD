@@ -53,7 +53,9 @@
                         FontAttributes="Bold"
                         Grid.Row="1"
                         Margin="80"
-                        HeightRequest="50"/>
+                        HeightRequest="50"
+                        x:Name="btnDashboardAddItem"
+                        Clicked="btnDashboardAddItem_Clicked"/>
             </Grid>
             <Grid Margin="10,0">
                 <Grid.RowDefinitions>

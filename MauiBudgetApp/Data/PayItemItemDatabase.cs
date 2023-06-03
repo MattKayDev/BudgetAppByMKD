@@ -65,16 +65,17 @@ namespace MauiBudgetApp.Data
             return Database.Table<PayItem>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
-        public Task<int> SaveItemAsync(PayItem item)
+        public async Task<int> SaveItemAsync(PayItem item)
         {
             if (item.ID != 0)
             {
-                return Database.UpdateAsync(item);
+                return await Database.UpdateAsync(item);
             }
             else
             {
                 item.IsVisible = true;
-                return Database.InsertAsync(item);
+                var res = await Database.InsertAsync(item);
+                return res;
             }
         }
 

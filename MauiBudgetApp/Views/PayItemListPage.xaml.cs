@@ -58,7 +58,7 @@ public partial class PayItemListPage : ContentPage
         {
             case "Income":
                 {
-                    await OpenNewItemPage(true);
+                    await OpenNewItemPage(false);
                     break;
                 }
             case "Expense":
@@ -101,20 +101,10 @@ public partial class PayItemListPage : ContentPage
     /// <returns></returns>
 	async Task OpenNewItemPage(bool isExpense = true)
 	{
-		if (isExpense)
-		{
-            await Navigation.PushAsync(new PayItemPage
-            {
-                BindingContext = new PayItem(isExpense)
-            });
-        }
-		else
-		{
-            await Navigation.PushAsync(new PayItemPage
-            {
-                BindingContext = new PayItem(isExpense)
-            });
-        }
+        await Navigation.PushAsync(new PayItemPage
+        {
+            BindingContext = new PayItem(isExpense)
+        });
     }
 
 	private void UpdateTotals(int expenseCount, int incomeCount)

@@ -17,7 +17,7 @@ public partial class PayItemPage : ContentPage
         if (payItem != null )
         {
             PayItemItemDatabase database = await PayItemItemDatabase.Instance;
-            await database.SaveItemAsync(payItem);
+            var res = await database.SaveItemAsync(payItem);
             await Navigation.PopAsync();
         }
         else

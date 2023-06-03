@@ -52,8 +52,10 @@ namespace MauiBudgetApp.Services
                 return 0;
             }
 
-            var leftToPay = payItems.Where(i => i.IsPaid).ToList().Sum(a => a.Amount);
-            return leftToPay;
+            var toPayAmount = this.GetTotalFor(payItems);
+            var paidAmount = payItems.Where(i => i.IsPaid).ToList().Sum(a => a.Amount);
+
+            return toPayAmount - paidAmount;
         }
 
         public async Task<List<PayItem>> GetExpenseItemsAsync()

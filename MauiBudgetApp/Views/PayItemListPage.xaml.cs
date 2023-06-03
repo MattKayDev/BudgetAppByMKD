@@ -27,6 +27,17 @@ public partial class PayItemListPage : ContentPage
             expenseListView.ItemsSource = expenseItems;
             this.expenseTotal = this.payItemService.GetTotalFor(expenseItems);
             txtTotalExpense.Text = $"£ {this.expenseTotal}";
+
+            var gotLeftToPay = this.payItemService.GetLeftToPay(expenseItems);
+            if (gotLeftToPay > 0 && gotLeftToPay != this.expenseTotal)
+            {
+                txtExpensesPaid.Text = $"Left to pay £{gotLeftToPay} / ";
+                txtExpensesPaid.IsVisible = true;
+            }
+            else
+            {
+                txtExpensesPaid.IsVisible = false;
+            }
         }
 
         var incomeItems = await this.payItemService.GetIncomeItemsAsync();

@@ -13,17 +13,17 @@ namespace MauiBudgetApp.Models
         private decimal amount;
         public PayItem() { }
 
-        public PayItem(bool isIncome = false)
+        public PayItem(bool isExpense = true)
         {
-            if (isIncome)
+            if (isExpense)
             {
-                IsIncome = isIncome;
-                IsExpense = false;
+                IsIncome = !isExpense;
+                IsExpense = isExpense;
             }
             else
             {
-                IsExpense = true;
-                IsIncome = isIncome;
+                IsExpense = isExpense;
+                IsIncome = !isExpense;
             }         
         }
 

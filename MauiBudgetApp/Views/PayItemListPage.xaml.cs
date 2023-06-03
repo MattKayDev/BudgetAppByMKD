@@ -52,8 +52,23 @@ public partial class PayItemListPage : ContentPage
     }
 
 	async void OnItemAdded(object sender, EventArgs eventArgs)
-	{
-		await OpenNewItemPage(await DisplayAlert("", "What would you like to add?", "Income", "Expense"));		
+	{	
+        var answer = await DisplayActionSheet("What would you like to add?", "Cancel", null, new string[] { "Income", "Expense" });
+        switch (answer)
+        {
+            case "Income":
+                {
+                    await OpenNewItemPage(true);
+                    break;
+                }
+            case "Expense":
+                {
+                    await OpenNewItemPage();
+                    break;
+                }
+            default:
+                break;
+        }
 	}
 
 	async void OnIncomeItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -79,7 +94,12 @@ public partial class PayItemListPage : ContentPage
 		}
 	}
 
-	async Task OpenNewItemPage(bool isExpense)
+    /// <summary>
+    /// Opens a new item page 
+    /// </summary>
+    /// <param name="isExpense">Is the new item expense, defaults to True</param>
+    /// <returns></returns>
+	async Task OpenNewItemPage(bool isExpense = true)
 	{
 		if (isExpense)
 		{

@@ -41,7 +41,7 @@
                 </Grid.RowDefinitions>
                 <BoxView Color="#3366ff" CornerRadius="10" Grid.RowSpan="1"/>
                 <StackLayout Orientation="Horizontal" Margin="0" Padding="10" Grid.Row="0" VerticalOptions="Center">
-                    <Label Text="Income Group" HorizontalOptions="StartAndExpand" FontSize="Medium" TextColor="White"/>
+                    <Label Text="Income" HorizontalOptions="StartAndExpand" FontSize="Medium" TextColor="White"/>
                     <Label x:Name="txtTotalIncome" HorizontalOptions="End" FontSize="Medium" FontAttributes="Bold" TextColor="White"/>
                 </StackLayout>
             </Grid>
@@ -64,7 +64,8 @@
                 </Grid.RowDefinitions>
                 <BoxView Color="#3366ff" CornerRadius="10" Grid.RowSpan="1"/>
                 <StackLayout Orientation="Horizontal" Padding="10" Grid.Row="0">
-                    <Label Text="Expense Group" HorizontalOptions="StartAndExpand" FontSize="Medium" TextColor="White"/>
+                    <Label Text="Expense" HorizontalOptions="StartAndExpand" FontSize="Medium" TextColor="White"/>
+                    <Label x:Name="txtExpensesPaid" HorizontalOptions="End" VerticalOptions="Center" FontSize="Small" FontAttributes="Bold" TextColor="LightGray"/>
                     <Label x:Name="txtTotalExpense" HorizontalOptions="End" FontSize="Medium" FontAttributes="Bold" TextColor="White"/>
                 </StackLayout>
             </Grid>

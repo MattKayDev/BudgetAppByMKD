@@ -22,6 +22,7 @@ public partial class PayItemListPage : ContentPage
 		base.OnAppearing();
 
         var expenseItems = await this.payItemService.GetExpenseItemsAsync();
+        var incomeItems = await this.payItemService.GetIncomeItemsAsync();
         if (expenseItems.Count > 0)
         {
             expenseListView.ItemsSource = expenseItems;
@@ -39,14 +40,24 @@ public partial class PayItemListPage : ContentPage
                 txtExpensesPaid.IsVisible = false;
             }
         }
+        else
+        {
+            this.txtTotalExpense.IsVisible = false;
+            this.expenseTotal = 0;
+            expenseListView.ItemsSource = new List<PayItem>();
+        }
 
-        var incomeItems = await this.payItemService.GetIncomeItemsAsync();
         if (incomeItems.Count > 0)
         {
             incomeListView.ItemsSource = incomeItems;
             this.incomeTotal = this.payItemService.GetTotalFor(incomeItems);
             txtTotalIncome.Text = $"£ {this.incomeTotal}";            
-        }    
+        }
+        else
+        {
+            txtTotalIncome.IsVisible = false;
+            incomeListView.ItemsSource = new List<PayItem>();
+        }
 
         UpdateTotals(expenseItems.Count, incomeItems.Count);
     }

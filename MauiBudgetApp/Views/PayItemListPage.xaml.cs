@@ -27,7 +27,8 @@ public partial class PayItemListPage : ContentPage
         {
             expenseListView.ItemsSource = expenseItems;
             this.expenseTotal = this.payItemService.GetTotalFor(expenseItems);
-            txtTotalExpense.Text = $"£ {this.expenseTotal}";
+            this.txtTotalExpense.IsVisible = true;
+            txtTotalExpense.Text = $"£{this.expenseTotal}";
 
             var gotLeftToPay = this.payItemService.GetLeftToPay(expenseItems);
             if (gotLeftToPay > 0 && gotLeftToPay != this.expenseTotal)
@@ -51,7 +52,8 @@ public partial class PayItemListPage : ContentPage
         {
             incomeListView.ItemsSource = incomeItems;
             this.incomeTotal = this.payItemService.GetTotalFor(incomeItems);
-            txtTotalIncome.Text = $"£ {this.incomeTotal}";            
+            txtTotalIncome.IsVisible = true;
+            txtTotalIncome.Text = $"£{this.incomeTotal}";            
         }
         else
         {
@@ -63,24 +65,9 @@ public partial class PayItemListPage : ContentPage
     }
 
 	async void OnItemAdded(object sender, EventArgs eventArgs)
-	{	
-        var answer = await DisplayActionSheet("What would you like to add?", "Cancel", null, new string[] { "Income", "Expense" });
-        switch (answer)
-        {
-            case "Income":
-                {
-                    await OpenNewItemPage(false);
-                    break;
-                }
-            case "Expense":
-                {
-                    await OpenNewItemPage();
-                    break;
-                }
-            default:
-                break;
-        }
-	}
+	{
+        await AddItem();
+    }
 
 	async void OnIncomeItemSelected(object sender, SelectedItemChangedEventArgs e)
 	{
@@ -120,54 +107,137 @@ public partial class PayItemListPage : ContentPage
 
 	private void UpdateTotals(int expenseCount, int incomeCount)
 	{
+        this.HideMainDashboard(false);
+
+        if (incomeCount > 0 && expenseCount == 0 )
+        {
+            this.SetupDashboardWithIncomeOnly();
+        }
+
+        if (expenseCount > 0 && incomeCount == 0 )
+        {
+            this.SetupDashboardWithExpenseOnly();
+        }
+
         if (expenseCount > 0 && incomeCount > 0)
         {
-            decimal moneyLeftAmount = this.incomeTotal - this.expenseTotal;
-            string moneyLeftText = $"£{moneyLeftAmount}";
+            this.SetupDashboardMain();
+        }
 
-            if (this.incomeTotal > 0)
-            {
-                decimal oneProcent = this.incomeTotal / 100;
-                var progress = Convert.ToDouble((this.expenseTotal / oneProcent)) * 0.01;
-                progressMoneyLeft.Progress = 1 - progress;
-
-                lblMoneyOutOf.Text = $"{txtTotalExpense.Text} / {txtTotalIncome.Text}";
-
-                if (this.expenseTotal > this.incomeTotal)
-                {
-                    lblDashboardStart.Text = "Based on your income and expenses you are using ";
-                    lblDashboardAmount.Text = $"£{moneyLeftAmount * -1}";
-                    lblDashboardEnd.Text = $" over your budget of £{this.incomeTotal}";
-                    lblInitialText.Text = $"{lblDashboardStart.Text}{lblDashboardAmount.Text}{lblDashboardEnd.Text}";
-
-                    lblMoneyLeftStart.Text = "You have ";
-                    lblMoneyLeftAmount.Text = moneyLeftText;
-                    lblMoneyLeftEnd.Text = " left of your budget.";
-                }
-                else
-                {
-
-                    lblDashboardStart.Text = "Based on your income and expenses you are using ";
-                    lblDashboardAmount.Text = txtTotalExpense.Text;
-                    lblDashboardEnd.Text = $" of your budget.";
-                    lblInitialText.Text = $"{lblDashboardStart.Text}{txtTotalExpense.Text}{lblDashboardEnd.Text}";
-
-                    lblMoneyLeftStart.Text = "You have ";
-                    lblMoneyLeftAmount.Text = moneyLeftText;
-                    lblMoneyLeftEnd.Text = " left of your budget.";
-                }
-            }
-            else
-            {
-                lblMoneyOutOf.Text = $"£{this.expenseTotal} / £0";
-                progressMoneyLeft.Progress = 0;
-                lblMoneyLeft.Text = $"You are using £{this.expenseTotal} over your budget";
-            }
+        if (incomeCount == 0 && expenseCount == 0)
+        {
+            this.HideMainDashboard(true);
         }
     }
 
     private async void OnSettingsClick(object sender, EventArgs e)
     {
         await DisplayAlert("Settings", "Nothing happens here yet!", "OK");
+    }
+
+    private void SetupDashboardWithIncomeOnly()
+    {
+        progressMoneyLeft.Progress = 1;
+        lblMoneyOutOf.IsVisible = false;
+        lblDashboardStart.Text = "It appears you have no expenses.";
+        //lblDashboardAmount.Text = $"£{moneyLeftAmount * -1}";
+        //lblDashboardEnd.Text = $" over your budget of £{this.incomeTotal}";
+        lblInitialText.Text = $"{lblDashboardStart.Text}";
+
+        lblMoneyLeftStart.Text = "You have ";
+        lblMoneyLeftAmount.Text = $"£ {this.incomeTotal}";
+        lblMoneyLeftEnd.Text = " left of your budget.";
+    }
+
+    private void SetupDashboardWithExpenseOnly()
+    {
+        progressMoneyLeft.Progress = 0;
+        lblMoneyOutOf.IsVisible = false;
+        lblDashboardStart.Text = "It appears you have no income, but you are using ";
+        lblDashboardAmount.Text = $"£{this.expenseTotal}";
+        lblDashboardEnd.Text = "";
+        lblInitialText.Text = $"{lblDashboardStart.Text}{lblDashboardAmount.Text}{lblDashboardEnd.Text}";
+
+        lblMoneyLeftStart.Text = "Apparently you are ";
+        lblMoneyLeftAmount.Text = $"£{this.expenseTotal}";
+        lblMoneyLeftEnd.Text = " out of budget.";
+    }
+
+    private void SetupDashboardMain()
+    {
+        decimal moneyLeftAmount = this.incomeTotal - this.expenseTotal;
+        string moneyLeftText = $"£{moneyLeftAmount}";
+
+        if (this.incomeTotal > 0)
+        {
+            decimal oneProcent = this.incomeTotal / 100;
+            var progress = Convert.ToDouble((this.expenseTotal / oneProcent)) * 0.01;
+            progressMoneyLeft.Progress = 1 - progress;
+
+
+            lblMoneyOutOf.IsVisible = true;
+            lblMoneyOutOf.Text = $"{txtTotalExpense.Text} / {txtTotalIncome.Text}";
+
+            if (this.expenseTotal > this.incomeTotal)
+            {
+                lblDashboardStart.Text = "Based on your income and expenses you are using ";
+                lblDashboardAmount.Text = $"£{moneyLeftAmount * -1}";
+                lblDashboardEnd.Text = $" over your budget of £{this.incomeTotal}";
+                lblInitialText.Text = $"{lblDashboardStart.Text}{lblDashboardAmount.Text}{lblDashboardEnd.Text}";
+
+                lblMoneyLeftStart.Text = "You have ";
+                lblMoneyLeftAmount.Text = moneyLeftText;
+                lblMoneyLeftEnd.Text = " left of your budget.";
+            }
+            else
+            {
+
+                lblDashboardStart.Text = "Based on your income and expenses you are using ";
+                lblDashboardAmount.Text = txtTotalExpense.Text;
+                lblDashboardEnd.Text = $" of your budget.";
+                lblInitialText.Text = $"{lblDashboardStart.Text}{txtTotalExpense.Text}{lblDashboardEnd.Text}";
+
+                lblMoneyLeftStart.Text = "You have ";
+                lblMoneyLeftAmount.Text = moneyLeftText;
+                lblMoneyLeftEnd.Text = " left of your budget.";
+            }
+        }
+        else
+        {
+            lblMoneyOutOf.Text = $"£{this.expenseTotal} / £0";
+            progressMoneyLeft.Progress = 0;
+            lblMoneyLeft.Text = $"You are using £{this.expenseTotal} over your budget";
+        }
+    }
+
+    private void HideMainDashboard(bool hide)
+    {
+            gridDashboardMain.IsVisible = !hide;
+            gridDashboardEmpty.IsVisible = hide;
+    }
+
+    private async Task AddItem()
+    {
+        var answer = await DisplayActionSheet("What would you like to add?", "Cancel", null, new string[] { "Income", "Expense" });
+        switch (answer)
+        {
+            case "Income":
+                {
+                    await OpenNewItemPage(false);
+                    break;
+                }
+            case "Expense":
+                {
+                    await OpenNewItemPage();
+                    break;
+                }
+            default:
+                break;
+        }
+    }
+
+    private async void btnDashboardAddItem_Clicked(object sender, EventArgs e)
+    {
+        await AddItem();
     }
 }

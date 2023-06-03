@@ -12,7 +12,7 @@
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout Orientation="Vertical" Margin="0">
-            <Grid Margin="10">
+            <Grid Margin="10" x:Name="gridDashboardMain" IsVisible="true">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="34" />
@@ -34,6 +34,28 @@
                     <Label x:Name="lblMoneyLeftEnd" Margin="0" TextColor="Black"/>
                 </StackLayout>
                 <Label x:Name="lblMoneyLeft" Grid.Row="3" Margin="10,0" TextColor="Black" IsVisible="False"/>
+            </Grid>
+            <Grid Margin="10" x:Name="gridDashboardEmpty" IsVisible="false" HeightRequest="120">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <BoxView Color="LightGray"  CornerRadius="10" Grid.RowSpan="2"/>
+                <Label Text="You have not added any items yet"
+                       Grid.Row="0"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"
+                       FontSize="Medium"/>
+                <Button Text="Add Income/Expense"
+                        BackgroundColor="#3366ff"
+                        TextColor="White"
+                        FontSize="Medium"
+                        FontAttributes="Bold"
+                        Grid.Row="1"
+                        Margin="80"
+                        HeightRequest="50"
+                        x:Name="btnDashboardAddItem"
+                        Clicked="btnDashboardAddItem_Clicked"/>
             </Grid>
             <Grid Margin="10,0">
                 <Grid.RowDefinitions>

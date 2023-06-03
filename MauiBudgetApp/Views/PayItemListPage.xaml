@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:MauiBudgetApp"
              Title="Budget App">
     <ContentPage.ToolbarItems>
-        <!--<ToolbarItem Clicked="OnSettingsClick" IconImageSource="cog.png"/>-->
+        <ToolbarItem Clicked="OnSettingsClick" IconImageSource="cog.png"/>
         <ToolbarItem Clicked="OnItemAdded" IconImageSource="plus.png"/>
 
     </ContentPage.ToolbarItems>

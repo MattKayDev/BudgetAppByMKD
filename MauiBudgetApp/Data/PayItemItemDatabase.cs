@@ -87,6 +87,7 @@ namespace MauiBudgetApp.Data
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 await Task.CompletedTask;
                 return 0;
             }

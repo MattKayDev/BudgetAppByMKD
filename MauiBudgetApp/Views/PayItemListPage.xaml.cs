@@ -30,7 +30,18 @@ public partial class PayItemListPage : ContentPage
             this.expenseItems = await this.payItemService.GetExpenseItemsAsync();
             this.incomeItems = await this.payItemService.GetIncomeItemsAsync();
 
+            try
+            {
+                var firstDay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                this.resetOnDay = Preferences.Default.Get("PayDay", firstDay);
+                this.clearedPaid = Preferences.Default.Get("ClearedPaid", true);
+            }
+            catch (Exception ex)
+            {
+
+            }
             
+
 
             if (this.expenseItems.Count > 0)
             {
@@ -72,21 +83,18 @@ public partial class PayItemListPage : ContentPage
 
             UpdateDashboard();
 
-            var today = DateTime.Today;
-            var firstDay = new DateTime(today.Year, today.Month, 1);
-            this.resetOnDay = Preferences.Default.Get("PayDay", firstDay);
-            this.clearedPaid = Preferences.Default.Get("ClearedPaid", true);
+           
 
-            if ((today >= this.resetOnDay) && !this.clearedPaid)
+            if ((DateTime.Today >= this.resetOnDay) && !this.clearedPaid)
             {
                 Preferences.Default.Set("PayDay", this.resetOnDay.AddMonths(1));
-                this.resetOnDay = Preferences.Default.Get("PayDay", today);
+                this.resetOnDay = Preferences.Default.Get("PayDay", DateTime.Today);
                 bool cleared = await this.ClearPaidValues(expenseItems);
                 if (cleared)
                 {
                     Preferences.Default.Set("ClearedPaid", true);
                     this.clearedPaid = true;
-                    Preferences.Default.Set("PayDay", today.AddMonths(1));
+                    Preferences.Default.Set("PayDay", DateTime.Today.AddMonths(1));
                 }
 
             }

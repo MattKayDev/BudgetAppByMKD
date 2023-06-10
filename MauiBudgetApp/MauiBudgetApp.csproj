@@ -12,10 +12,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>MauiBudgetApp</ApplicationTitle>
+		<ApplicationTitle>Budget App By MKD</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.MauiBudgetApp</ApplicationId>
+		<ApplicationId>com.mattkaydev.BudgetAppByMKD</ApplicationId>
 		<ApplicationIdGuid>e48c62ad-aa4c-477e-a4e3-2d711ef8a8a0</ApplicationIdGuid>
 
 		<!-- Versions -->
@@ -29,6 +29,15 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<PackageIcon>icon.png</PackageIcon>
+		<AssemblyName>BudgetAppByMKD</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-android|AnyCPU'">
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-android|AnyCPU'">
+	  <AndroidKeyStore>False</AndroidKeyStore>
 	</PropertyGroup>
 
 	<ItemGroup>

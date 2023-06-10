@@ -43,9 +43,13 @@ public partial class SettingsView : ContentPage
             else
             {
                 var today = DateTime.Today;
-                var firstDay = new DateTime(today.Year, today.Month, 1);
-                var lastDay = firstDay.AddMonths(1).AddDays(-1);
-                var day = firstDay.AddDays(numberOfDays - 1);
+                var firstDayOfThisMonth = new DateTime(today.Year, today.Month, 1);
+                var lastDayOfCurrentMonth = firstDayOfThisMonth.AddMonths(1).AddDays(-1);
+                var day = firstDayOfThisMonth.AddDays(numberOfDays - 1);
+                if ((day < today) && day.Month == DateTime.Today.Month)
+                {
+                    day = day.AddMonths(1);
+                }
                 Preferences.Default.Set("PayDay", day);
                 Preferences.Default.Set("ClearedPaid", false);
                 await DisplayAlert("Updated!", "'Paid' day has been updated.", "OK");

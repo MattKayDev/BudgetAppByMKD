@@ -10,6 +10,10 @@ public partial class PayItemListPage : ContentPage
     PayItemService payItemService;
 	private decimal incomeTotal = 0;
 	private decimal expenseTotal = 0;
+    private List<PayItem> expenseItems;
+    private List<PayItem> incomeItems;
+    private DateTime resetOnDay;
+    private bool clearedPaid;
 
 	public PayItemListPage()
 	{
@@ -21,50 +25,115 @@ public partial class PayItemListPage : ContentPage
 	{
 		base.OnAppearing();
 
-        var expenseItems = await this.payItemService.GetExpenseItemsAsync();
-        var incomeItems = await this.payItemService.GetIncomeItemsAsync();
-        if (expenseItems.Count > 0)
+        try
         {
-            expenseListView.ItemsSource = expenseItems;
-            this.expenseTotal = this.payItemService.GetTotalFor(expenseItems);
-            this.txtTotalExpense.IsVisible = true;
-            txtTotalExpense.Text = $"£{this.expenseTotal}";
+            this.expenseItems = await this.payItemService.GetExpenseItemsAsync();
+            this.incomeItems = await this.payItemService.GetIncomeItemsAsync();
 
-            var gotLeftToPay = this.payItemService.GetLeftToPay(expenseItems);
-            if (gotLeftToPay > 0 && gotLeftToPay != this.expenseTotal)
+            
+
+            if (this.expenseItems.Count > 0)
             {
-                txtExpensesPaid.Text = $"Left to pay £{gotLeftToPay} / ";
-                txtExpensesPaid.IsVisible = true;
+                expenseListView.ItemsSource = this.expenseItems;
+                this.expenseTotal = this.payItemService.GetTotalFor(this.expenseItems);
+                this.txtTotalExpense.IsVisible = true;
+                txtTotalExpense.Text = $"£{this.expenseTotal}";
+
+                var gotLeftToPay = this.payItemService.GetLeftToPay(this.expenseItems);
+                if (gotLeftToPay > 0 && gotLeftToPay != this.expenseTotal)
+                {
+                    txtExpensesPaid.Text = $"Left to pay £{gotLeftToPay} / ";
+                    txtExpensesPaid.IsVisible = true;
+                }
+                else
+                {
+                    txtExpensesPaid.IsVisible = false;
+                }
             }
             else
             {
-                txtExpensesPaid.IsVisible = false;
+                this.txtTotalExpense.IsVisible = false;
+                this.expenseTotal = 0;
+                expenseListView.ItemsSource = new List<PayItem>();
             }
-        }
-        else
-        {
-            this.txtTotalExpense.IsVisible = false;
-            this.expenseTotal = 0;
-            expenseListView.ItemsSource = new List<PayItem>();
-        }
 
-        if (incomeItems.Count > 0)
-        {
-            incomeListView.ItemsSource = incomeItems;
-            this.incomeTotal = this.payItemService.GetTotalFor(incomeItems);
-            txtTotalIncome.IsVisible = true;
-            txtTotalIncome.Text = $"£{this.incomeTotal}";            
-        }
-        else
-        {
-            txtTotalIncome.IsVisible = false;
-            incomeListView.ItemsSource = new List<PayItem>();
-        }
+            if (this.incomeItems.Count > 0)
+            {
+                incomeListView.ItemsSource = this.incomeItems;
+                this.incomeTotal = this.payItemService.GetTotalFor(this.incomeItems);
+                txtTotalIncome.IsVisible = true;
+                txtTotalIncome.Text = $"£{this.incomeTotal}";            
+            }
+            else
+            {
+                txtTotalIncome.IsVisible = false;
+                incomeListView.ItemsSource = new List<PayItem>();
+            }
 
-        UpdateTotals(expenseItems.Count, incomeItems.Count);
+            UpdateDashboard();
+
+            var today = DateTime.Today;
+            var firstDay = new DateTime(today.Year, today.Month, 1);
+            this.resetOnDay = Preferences.Default.Get("PayDay", firstDay);
+            this.clearedPaid = Preferences.Default.Get("ClearedPaid", true);
+
+            if ((today >= this.resetOnDay) && !this.clearedPaid)
+            {
+                Preferences.Default.Set("PayDay", this.resetOnDay.AddMonths(1));
+                this.resetOnDay = Preferences.Default.Get("PayDay", today);
+                bool cleared = await this.ClearPaidValues(expenseItems);
+                if (cleared)
+                {
+                    Preferences.Default.Set("ClearedPaid", true);
+                    this.clearedPaid = true;
+                    Preferences.Default.Set("PayDay", today.AddMonths(1));
+                }
+
+            }
+
+            //var res = await CheckIfPaidNeedsClearing(resetOnDay);
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("ERROR", ex.Message, "OK");
+        }
     }
 
-	async void OnItemAdded(object sender, EventArgs eventArgs)
+    private async Task<bool> CheckIfPaidNeedsClearing(DateTime resetOn)
+    {
+        var today = DateTime.Today;
+        
+        if (resetOn >= today)
+        {
+            if (await DisplayAlert("Update Paid expenses?","Would you like to clear Paid option on your expenses?","Yes","No"))
+            {
+                foreach (var item in expenseItems)
+                {
+                    item.IsPaid = false;
+                    await this.payItemService.SaveItemAsync(item);
+                }
+            }
+        }
+
+
+        //if (((this.resetOnDay == today) && !this.clearedPaid) ||
+        //    ((this.resetOnDay != today) && !this.clearedPaid))
+        //{
+        //    if (await this.ClearPaidValues(this.expenseItems))
+        //    {
+        //        Console.WriteLine("Cleared Paid items");
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Not cleared paid items");
+        //        return false;
+        //    }
+        //}
+        return true;
+    }
+
+    async void OnItemAdded(object sender, EventArgs eventArgs)
 	{
         await AddItem();
     }
@@ -105,8 +174,10 @@ public partial class PayItemListPage : ContentPage
         });
     }
 
-	private void UpdateTotals(int expenseCount, int incomeCount)
+	private void UpdateDashboard()
 	{
+        int expenseCount = this.expenseItems.Count;
+        int incomeCount = this.incomeItems.Count;
         this.HideMainDashboard(false);
 
         if (incomeCount > 0 && expenseCount == 0 )
@@ -240,5 +311,29 @@ public partial class PayItemListPage : ContentPage
     private async void btnDashboardAddItem_Clicked(object sender, EventArgs e)
     {
         await AddItem();
+    }
+
+    private async Task<bool> ClearPaidValues(List<PayItem> items)
+    {
+        try
+        {
+            bool cleared = true;
+            foreach (var item in items)
+            {
+                item.IsPaid = !cleared;
+                await this.payItemService.SaveItemAsync(item);
+            }
+
+            Preferences.Default.Set("ClearedPaid", cleared);
+            this.clearedPaid = cleared;
+
+            return cleared;
+
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("ERROR", ex.Message, "OK");
+            return false;
+        }
     }
 }

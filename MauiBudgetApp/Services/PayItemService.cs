@@ -32,6 +32,27 @@ namespace MauiBudgetApp.Services
             }
         }
 
+        public async Task<bool> SaveItemAsync(PayItem item)
+        {
+            if (item == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                PayItemItemDatabase database = await PayItemItemDatabase.Instance;
+                var res = await database.SaveItemAsync(item);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await Task.CompletedTask;
+                return false;
+            }
+        }
+
         public decimal GetTotalFor(List<PayItem> payItems)
         {
             if (payItems.Count > 0)

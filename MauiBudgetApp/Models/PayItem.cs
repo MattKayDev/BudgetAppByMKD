@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MauiBudgetApp.Models
 {
-    public class PayItem
+    public class PayItem : IPayItem
     {
         private string amountText;
         private decimal amount;

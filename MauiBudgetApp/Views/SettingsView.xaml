@@ -24,20 +24,17 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
-                    <Label Text="Reset 'Paid' on day of the month"
+                    <Label Text="Clear Paid Items"
                            HorizontalOptions="Start"
                            VerticalTextAlignment="Center"
                            FontSize="Medium"
                            Grid.Column="0"/>
-                    <Entry x:Name="txtDayOfTheMonth"
-                           Keyboard="Numeric"
-                           MaxLength="2"
-                           VerticalTextAlignment="Center"
-                           HorizontalTextAlignment="Center"
+                    <Button x:Name="btnClearPaidItems"
+                            Clicked="btnClearPaidItems_Clicked"
                            VerticalOptions="EndAndExpand"
                            HorizontalOptions="EndAndExpand"
                            FontSize="Medium"
-                       Grid.Column="1"/>
+                           Grid.Column="1"/>
                     <Label Grid.Row="1"
                            Grid.Column="0"
                            FontSize="Medium"

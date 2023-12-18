@@ -7,18 +7,23 @@ namespace MauiBudgetApp.Views;
 
 public partial class PayItemListPage : ContentPage
 {
-    PayItemService payItemService;
+    ExpensePayItemService expenseService;
+    IncomePayItemService incomeService;
+
 	private decimal incomeTotal = 0;
 	private decimal expenseTotal = 0;
-    private List<PayItem> expenseItems;
-    private List<PayItem> incomeItems;
-    private DateTime resetOnDay;
-    private bool clearedPaid;
 
-	public PayItemListPage()
+    private List<ExpenseItem> expenseItems;
+    private List<IncomeItem> incomeItems;
+
+	public PayItemListPage(ExpensePayItemService expenseService, IncomePayItemService incomeService)
 	{
 		InitializeComponent();
-        this.payItemService = new PayItemService();
+
+        this.expenseService = expenseService;
+        this.incomeService = incomeService;
+        this.expenseItems = Task.Run(async () => await this.expenseService.GetExpenseItemsAsync()).Result;
+        this.incomeItems = Task.Run(async () => await this.incomeService.GetIncomeItemsAsync()).Result;
     }
 
 	protected override async void OnAppearing()
@@ -27,30 +32,14 @@ public partial class PayItemListPage : ContentPage
 
         try
         {
-            this.expenseItems = await this.payItemService.GetExpenseItemsAsync();
-            this.incomeItems = await this.payItemService.GetIncomeItemsAsync();
-
-            try
-            {
-                var firstDay = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-                this.resetOnDay = Preferences.Default.Get("PayDay", firstDay);
-                this.clearedPaid = Preferences.Default.Get("ClearedPaid", true);
-            }
-            catch (Exception ex)
-            {
-
-            }
-            
-
-
             if (this.expenseItems.Count > 0)
             {
                 expenseListView.ItemsSource = this.expenseItems;
-                this.expenseTotal = this.payItemService.GetTotalFor(this.expenseItems);
+                this.expenseTotal = await this.expenseService.GetTotalFor();
                 this.txtTotalExpense.IsVisible = true;
                 txtTotalExpense.Text = $"£{this.expenseTotal}";
 
-                var gotLeftToPay = this.payItemService.GetLeftToPay(this.expenseItems);
+                var gotLeftToPay = await this.expenseService.GetLeftToPay();
                 if (gotLeftToPay > 0 && gotLeftToPay != this.expenseTotal)
                 {
                     txtExpensesPaid.Text = $"Left to pay £{gotLeftToPay} / ";
@@ -71,7 +60,7 @@ public partial class PayItemListPage : ContentPage
             if (this.incomeItems.Count > 0)
             {
                 incomeListView.ItemsSource = this.incomeItems;
-                this.incomeTotal = this.payItemService.GetTotalFor(this.incomeItems);
+                this.incomeTotal = await this.incomeService.GetTotalFor();
                 txtTotalIncome.IsVisible = true;
                 txtTotalIncome.Text = $"£{this.incomeTotal}";            
             }
@@ -82,68 +71,11 @@ public partial class PayItemListPage : ContentPage
             }
 
             UpdateDashboard();
-
-           
-
-            if ((DateTime.Today >= this.resetOnDay) && !this.clearedPaid)
-            {
-                Preferences.Default.Set("PayDay", this.resetOnDay.AddMonths(1));
-                this.resetOnDay = Preferences.Default.Get("PayDay", DateTime.Today);
-                bool cleared = await this.ClearPaidValues(expenseItems);
-                if (cleared)
-                {
-                    Preferences.Default.Set("ClearedPaid", true);
-                    this.clearedPaid = true;
-                    Preferences.Default.Set("PayDay", DateTime.Today.AddMonths(1));
-                }
-
-            }
-
-            //var res = await CheckIfPaidNeedsClearing(resetOnDay);
         }
         catch (Exception ex)
         {
             await DisplayAlert("ERROR", ex.Message, "OK");
         }
-    }
-
-    private async Task<bool> CheckIfPaidNeedsClearing(DateTime resetOn)
-    {
-        var today = DateTime.Today;
-        
-        if (resetOn >= today)
-        {
-            if (await DisplayAlert("Update Paid expenses?","Would you like to clear Paid option on your expenses?","Yes","No"))
-            {
-                foreach (var item in expenseItems)
-                {
-                    item.IsPaid = false;
-                    await this.payItemService.SaveItemAsync(item);
-                }
-            }
-        }
-
-
-        //if (((this.resetOnDay == today) && !this.clearedPaid) ||
-        //    ((this.resetOnDay != today) && !this.clearedPaid))
-        //{
-        //    if (await this.ClearPaidValues(this.expenseItems))
-        //    {
-        //        Console.WriteLine("Cleared Paid items");
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Not cleared paid items");
-        //        return false;
-        //    }
-        //}
-        return true;
-    }
-
-    async void OnItemAdded(object sender, EventArgs eventArgs)
-	{
-        await AddItem();
     }
 
 	async void OnIncomeItemSelected(object sender, SelectedItemChangedEventArgs e)
@@ -174,12 +106,22 @@ public partial class PayItemListPage : ContentPage
     /// </summary>
     /// <param name="isExpense">Is the new item expense, defaults to True</param>
     /// <returns></returns>
-	async Task OpenNewItemPage(bool isExpense = true)
+	async Task OpenNewItemPage(bool isExpense)
 	{
-        await Navigation.PushAsync(new PayItemPage
+        if (isExpense)
         {
-            BindingContext = new PayItem(isExpense)
-        });
+            await Navigation.PushAsync(new PayItemPage
+            {
+                BindingContext = new ExpenseItem()
+            });
+        }
+        else
+        {
+            await Navigation.PushAsync(new PayItemPage
+            {
+                BindingContext = new IncomeItem()
+            });
+        }
     }
 
 	private void UpdateDashboard()
@@ -212,7 +154,7 @@ public partial class PayItemListPage : ContentPage
     private async void OnSettingsClick(object sender, EventArgs e)
     {
         //await DisplayAlert("Settings", "Nothing happens here yet!", "OK");
-        await Navigation.PushAsync(new SettingsView());
+        await Navigation.PushAsync(new SettingsView(this.expenseService, this.incomeService));
     }
 
     private void SetupDashboardWithIncomeOnly()
@@ -308,7 +250,7 @@ public partial class PayItemListPage : ContentPage
                 }
             case "Expense":
                 {
-                    await OpenNewItemPage();
+                    await OpenNewItemPage(true);
                     break;
                 }
             default:
@@ -319,29 +261,5 @@ public partial class PayItemListPage : ContentPage
     private async void btnDashboardAddItem_Clicked(object sender, EventArgs e)
     {
         await AddItem();
-    }
-
-    private async Task<bool> ClearPaidValues(List<PayItem> items)
-    {
-        try
-        {
-            bool cleared = true;
-            foreach (var item in items)
-            {
-                item.IsPaid = !cleared;
-                await this.payItemService.SaveItemAsync(item);
-            }
-
-            Preferences.Default.Set("ClearedPaid", cleared);
-            this.clearedPaid = cleared;
-
-            return cleared;
-
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("ERROR", ex.Message, "OK");
-            return false;
-        }
     }
 }

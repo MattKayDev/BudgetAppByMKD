@@ -14,7 +14,8 @@ namespace MauiBudgetApp.Data
                 var instance = new PayItemItemDatabase();
                 try
                 {
-                    CreateTableResult expense = await Database.CreateTableAsync<PayItem>();
+                    CreateTableResult expenseTable = await Database.CreateTableAsync<ExpenseItem>();
+                    CreateTableResult incomeTable = await Database.CreateTableAsync<IncomeItem>();
                 }
                 catch (Exception ex)
                 {
@@ -30,60 +31,120 @@ namespace MauiBudgetApp.Data
             Database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
         }
 
-        public Task<List<PayItem>> GetItemsAsync()
+        /// <summary>
+        /// Gets all pay items.
+        /// </summary>
+        /// <returns>List of pay items.</returns>
+        public async Task<List<PayItem>> GetAllItemsAsync()
         {
-            return Database.Table<PayItem>().ToListAsync();
+            var incomeItems = await Database.Table<IncomeItem>().ToListAsync();
+            var expenseItems = await Database.Table<ExpenseItem>().ToListAsync();
+
+            List<PayItem> payItems = new List<PayItem>();
+            foreach (var item in incomeItems)
+            {
+                payItems.Add(item);
+            }
+
+            foreach (var expenseItem in expenseItems)
+            {
+                payItems.Add(expenseItem);
+            }
+
+            return payItems;
         }
 
-        public async Task<List<PayItem>> GetExpenseItems()
+        /// <summary>
+        /// Gets all Income items
+        /// </summary>
+        /// <returns>List of Income items.</returns>
+        public Task<List<IncomeItem>> GetIncomeItemsAsync()
         {
-            try
-            {
-                return await Database.Table<PayItem>().Where(i => i.IsExpense).ToListAsync();
-            }
-            catch (Exception)
-            {
-                return await ReturnEmptyList();
-            }
+            return Database.Table<IncomeItem>().ToListAsync();
         }
 
-        public async Task<List<PayItem>> GetIncomeItems()
+        /// <summary>
+        /// Gets all Expense items
+        /// </summary>
+        /// <returns>List of expense items</returns>
+        public Task<List<ExpenseItem>> GetExpenseItemsAsync()
         {
-            try
-            {
-                return await Database.Table<PayItem>().Where(i => i.IsIncome).ToListAsync();
-            }
-            catch (Exception)
-            {
-
-                return await ReturnEmptyList();
-            }
+            return Database.Table<ExpenseItem>().ToListAsync();
         }
 
-        public Task<PayItem> GetItemAsync(int id)
+        /// <summary>
+        /// Gets specific Income item based on ID.
+        /// </summary>
+        /// <param name="id">ID of the income item to find.</param>
+        /// <returns>Income item</returns>
+        public Task<IncomeItem> GetIncomeItemAsync(int id)
         {
-            return Database.Table<PayItem>().Where(i => i.ID == id).FirstOrDefaultAsync();
+            return Database.Table<IncomeItem>().Where(i => i.ID == id).FirstOrDefaultAsync();
         }
 
+        /// <summary>
+        /// Gets specific Expense item based on ID.
+        /// </summary>
+        /// <param name="id">ID of the expense item to find.</param>
+        /// <returns>Expense item</returns>
+        public Task<ExpenseItem> GetExpenseItemAsync(int id)
+        {
+            return Database.Table<ExpenseItem>().Where(i => i.ID == id).FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Saves the payitem.
+        /// </summary>
+        /// <param name="item">The payitem to save (income or expense)</param>
+        /// <returns>Int indicating if it save/updated record.</returns>
         public async Task<int> SaveItemAsync(PayItem item)
         {
-            if (item.ID != 0)
+            if (item is ExpenseItem)
             {
-                return await Database.UpdateAsync(item);
+                if (item.ID != 0)
+                {
+                    return await Database.UpdateAsync((ExpenseItem)item);
+                }
+                else
+                {
+                    item.IsVisible = true;
+                    var res = await Database.InsertAsync((ExpenseItem)item);
+                    return res;
+                }
             }
             else
             {
-                item.IsVisible = true;
-                var res = await Database.InsertAsync(item);
-                return res;
+                if (item.ID != 0)
+                {
+                    return await Database.UpdateAsync((IncomeItem)item);
+                }
+                else
+                {
+                    item.IsVisible = true;
+                    var res = await Database.InsertAsync((IncomeItem)item);
+                    return res;
+                }
             }
+            
         }
 
+        /// <summary>
+        /// Deteles specific pay item
+        /// </summary>
+        /// <param name="item">Pay item to delete</param>
+        /// <returns>int indicating how many records where deleted.</returns>
         public async Task<int> DeleteItemAsync(PayItem item)
         {
             try
             {
-                return await Database.DeleteAsync(item);
+                if (item is ExpenseItem)
+                {
+                    return await Database.DeleteAsync((ExpenseItem)item);
+                }
+                else
+                {
+                    return await Database.DeleteAsync((IncomeItem)item);
+                }
             }
             catch (Exception ex)
             {
@@ -99,6 +160,11 @@ namespace MauiBudgetApp.Data
             await Task.CompletedTask;
             List<PayItem> empty = new List<PayItem>();
             return empty;
+        }
+
+        internal Task GetIncomeItemAsync()
+        {
+            throw new NotImplementedException();
         }
     }
 }

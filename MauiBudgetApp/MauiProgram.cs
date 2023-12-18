@@ -5,6 +5,7 @@ using MauiBudgetApp.Platforms.Android;
 //using MauiBudgetApp.Platforms.iOS;
 //#endif
 
+using MauiBudgetApp.Services;
 using Microsoft.Extensions.Logging;
 
 namespace MauiBudgetApp;
@@ -35,6 +36,11 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 
-		return builder.Build();
+		var expensePayItemService = new ExpensePayItemService();
+        var incomePayItemService = new IncomePayItemService();
+        builder.Services.AddSingleton<ExpensePayItemService>(expensePayItemService);
+        builder.Services.AddSingleton<IncomePayItemService>(incomePayItemService);
+
+        return builder.Build();
 	}
 }
